@@ -1,3 +1,4 @@
+import scala.annotation.tailrec
 
 sealed trait Option[+A] {
 
@@ -50,11 +51,24 @@ object Option {
   }
 
   def sequence2[A](as: List[Option[A]]): Option[List[A]] = {
-    as.foldLeft(Option(List[A]())) { (acc, ao) => ao.flatMap(a => acc.map(_ ++ List(a))) }
+    as match {
+      case Nil => Some(List())
+      case h::t => h flatMap{ a => sequence2(t).map(List(a) ++ _)
+      }
+    }
 
   }
 }
 
 object ex4 extends App {
+  val list = List(Some(1),Some(2),Some(3))
+  val listNone = List(Some(1),Some(2),None)
+  val listEmpty = List()
 
+  println(Option.sequence(list))
+  println(Option.sequence(listNone))
+  println(Option.sequence(listEmpty))
+  println(Option.sequence2(list))
+  println(Option.sequence2(listNone))
+  println(Option.sequence2(listEmpty))
 }
